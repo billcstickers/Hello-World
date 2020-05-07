@@ -1,0 +1,48 @@
+
+use utf8;
+use Lava;
+use Macro;
+
+sub { SetActiveWindow("PRIMARY"); },
+my $panel = new Lava::Panel();
+
+
+#Gets list of files in directory.
+	opendir my $dir, "\\\\TARFS01\\OpenCut-Tarrawonga\\Vulcan_Projects\\Survey\\Triangles\\Pit Updates" or die "Cannot open directory: $!";
+	my @files = readdir $dir;
+	closedir $dir;!
+
+# Gets the last 5 and sticks them in a hash.
+my %lastfive;
+foreach(@files[-5..-1]){
+	$lastfive{$_} = 0;
+}
+
+
+
+$panel->text("Pick triangles");
+    foreach(keys %lastfive){
+    $panel->logical_button($_, $lastfive{$_});
+    }
+    
+$panel->execute("Tri picker") or exit;
+
+
+print "\nResults: \n" ;
+print map { "$_ => $lastfive{$_}\n" } keys %lastfive;
+print "______________________________________________\n";
+
+
+
+
+foreach(keys %lastfive)
+{
+	if ( $lastfive{$_} == 1 )
+		{
+			print "Loading: ".$_." ----- "."\n";
+			RunMenu("TRI_UTE_LOAD:\\\\TARFS01\\OpenCut-Tarrawonga\\Vulcan_Projects\\Survey\\Triangles\\Pit Updates\\".$_,"abort",
+   			"FINISH") || die "Macro mismatch.\n";
+		}
+}
+
+
